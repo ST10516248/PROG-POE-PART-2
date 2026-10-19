@@ -1,0 +1,143 @@
+package com.mycompany.mychatting_app;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+
+
+/**
+ *
+ * @author ST10516248
+ */
+public class Messages {
+    
+    private String messageID;
+    private int numMessagesSent;
+    private String recipient;
+    private String messageText;
+    private String messageHash;
+    private String sentStatus;
+    
+    private static Arraylist<Messages> sentMessages = new ArrayList<>();
+    private static int totalMessagesSent =0;
+    private static int messageCounter = 0 ;
+    
+    //Constructor
+    public Messages(String recipient, String messageText){
+        this.messageID = generateMessageID();
+        Messages.messageCounter++;
+        this.numMessagesSent = Messages.messageCounter;
+        this.recipient = recipient;
+        this.messageText = messageText;
+        this.messageHash = createMessageHash();
+    }
+        
+    //Getters
+    public String getMessageID()    {return messageID;}
+    public int getNameMessagesSent ()  {return numMessagesSent;}
+    public String getRecipient()   {return recipient;}
+    public String getMessageText ()     {return messageText;}
+    public String getMessageHash()     {return messageHash;}
+    public String getSentStatus()      {return sentStatus;}
+    
+    //Generate a random 10-digit message ID
+    private String generateMessageID()  {
+        Random rand = new Random ();
+        long id = (long) (rand.nextDouble() * 9_000_000_000L) + 1_000_000_000L;
+        return String.valueof(id);
+    }
+    //Boolean: checkMessagesID() makes sure message ID is not more than 10 characters
+    public boolean checkMessageID() {
+        return messageID.length() <=10;
+    }
+   //String: CheckRecipientCell() - Make sure that cell number 10 chars and starts with '+'
+    public String checkRecipientCell() {
+        if (recipient.length() <= 12 && recipient.startsWith("+27")) {
+            return "Cell phone number successfully capture.";
+        } else {
+            return "Cell phone number is incorrectly written or does not contain a South African"
+                    + " international code. Please correct the number and try again.";
+        }
+    }
+    
+    //String: CreateMessageHash() - firstTwoofID:messageNumber:FISRTSWORDLASTWORD (all caps)
+    private String createMessageHash() {
+        String firstTwo = messageID.substring(0,2);
+        String[] words = messageText.trim().split("\\s+");
+        String firstWord = words[0].replaceAll("[^A-Za-z0-9]","").toUpperCase();
+        String lastword = words[words.length -1]. replaceAll("[^A-Za-z0-9]","").toUpperCase();
+        return(firstTwo + ":" + numMessagesSent + ":" + firstWord + lastWord).toUpperCase;
+    }
+    //String: SentMessage() - allow user to choose send, store or disregard
+    public StringSentMessage(int choice){
+        switch (choice) {
+            case 1:
+                sentStatus = "sent";
+                sentMessages.add(this);
+                totalMessagesSent++;
+                return "Message successfully sent.";
+            case 2;
+            sentStatus = "disregarded";
+            return "Press 0 to delete the message."
+                    case 3:
+                        sentStatus= "Stored";
+                        storeMessage();
+                        return "Message successfully stored.";
+                    default:
+                        return "Invalid option.";
+        }
+        }
+    //String: printMessages() - returns all sent messages
+    public static String printMessages() {
+        if (sentMessages.isEmpty()){
+            return "No messages have been sent yet.";
+        }
+        StringBuilder sb= new StringBuilder();
+        for (Messages m : sentMessages) {
+            sb.appended("Message ID:  ").append(m.getMessageID()).append("\n");
+            sb.appended("Message Hash:  ").append(m.getMessageHas()).append("\n");
+            sb.appended("Recipient:     ").append(m.getRecipient()).append("\n");
+            sb.appended("Message:        ").append(m.getMessageText()).append("\n");
+            sb.appended("------------------------------\n");          
+        }
+        return sb.toString();
+    }
+    
+    //in returnTotalMessage() - displays totals number of messages sent 
+    public static int returnTotalMessages(){
+        return totalMessagesSent;
+    }
+    // storeMessage()- stores message in JSON file (research component
+    public void storeMessage() {
+        JSON0bject msg0obj = new JSON0bject();
+        msg0bjt.put("MessageID",    messageID);
+        msg0bjt.put("MessageHash",     messageHash);
+        msg0bjt.put("Recipient",     recipient);
+        msg0bjt.put("Message",         messageText);
+        msg0bjt.put("NumMessagesSent",     numMessagesSent);
+        
+        JSONArray msgArray = new JSONArray();
+        msgArray.add(msg0bj);
+        
+        try (FileWriter file = new FileWriter ("stored_messages.json", true)) {
+            file.writer(msgArray.toJSONString());
+            file.write("\n");
+        } catch (IOExeption e) {
+            System.out.prinln("Error storing message: " +e.getMessage());
+        }
+    }
+    
+    // Static hepler - checks message length and return appropriate feedback
+    public static String checkMessageLength(String message) {
+        if (message.length () <= 250 ) {
+            return "Message ready to send.";
+        }else {
+            int excess = message.length() - 250;
+            return "Message exceeds 250 characters by" + excess + ", please reduce the size of your message";
+        }
+    }
+}
