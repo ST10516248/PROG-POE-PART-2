@@ -1,0 +1,164 @@
+package com.mycompany.mychatting_app;
+import java.util.Scanner;
+import java.io.*;
+
+/**
+ *
+ * @author ST10516248
+ */
+//login class of MyChatting_App
+public class Login {
+    private static final String USER_FILE = "users.txt";
+    
+    //Validation methods
+    public boolean isValidUsername(String username){
+        return username.contains("_")&& username.length() <=5;
+        
+    }
+    public boolean isValidPassword(String Password){
+        return Password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")
+                && Password.length() >=8
+                && Password.matches(".*[A-Z].*")
+                && Password.matches(".*[0-9].*");
+    }
+    public boolean isValidCellphone(String CellphoneNumber){
+        //must start with +27, followed by 9 digits(12 total number)
+        return CellphoneNumber.matches("\\+27[0-9]{9}");
+    }
+    
+    //Register @
+    public void registerUser(){
+        Scanner input = new Scanner(System.in);
+        
+       System.out.println("Enter Username: ") ;
+       String username = input.nextLine();
+       
+       System.out.println("Enter password: ");
+       String Password = input.nextLine();
+       
+       System.out.println("Enter Cellphone(+27..): ");
+       String CellphoneNumber = input.nextLine();
+       
+       String message = "";
+       boolean allValid = true;
+       
+       //UserName
+       message += "\nUSERNAME CHECK:\n";
+       if (username.contains("_")){
+           message += "Contains and Underscore(_)\n";
+       } else {
+           message += "Must contain an underscore (_)\n";
+           allValid = false;
+       }
+       if (username.length() <=5){
+           message += "[SUCCESSFUL] Length is 5 or less\n";
+       } else {
+           message += "[UNSUCCESSFUL] Must not be more than 5 characters\n";
+           allValid = false;
+           
+       }
+       ///Password
+       message += "\nPASSWORD CHECK:\n";
+       if (Password.length() >=8){
+           message += "[SUCCESSFUL] Password is at least 8 characters long\n";
+       }else {
+           message += "[UNSUCCESSFUL] Password must be at least 8 characters long\n";
+           allValid = false;
+       }
+       if (Password.matches(".*[A-Z].*")){
+           message += "[SUCCESSFUL] contains an uppercase letter\n";
+       } else {
+           message += "[UNSUCCESSFUL] must contain at least one uppercase letter\n";
+           allValid = false;
+       }
+       if (Password.matches(".*[0-9].*")) {
+           message += "[SUCCESSFUL] contains a number\n";
+       } else {
+           message += "[UNSUCCESSFUL] must contain at lease one number\n";
+           allValid = false;
+       }
+       if (Password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")){
+           message += "[SUCCESSFUL] contains a special character\n";
+       } else {
+           message += "[UNSUCCESSFUL] must contain at least one special character(!@#$...)\n";
+           allValid = false;
+       }
+       //Cellphone
+       message += "\nCELLPHONE CHECK:\n";
+       if (isValidCellphone(CellphoneNumber)){
+           message += "[SUCCESSFUL] Valid South African number (+27 + 9 digits)\n";
+       } else {
+           message += "[UNSUCCESFUL] must be +27 followed by exactly 9 digits (e.g.+2780276939)\n";
+           allValid = false;
+       }
+       message += "\n----------------\n";
+       if (allValid) {
+           // Checks if username exist
+           if (userExist(username)) {
+               message += "REGISTRATION UNSUCCESSFUL. Username '" + username + "'already exist.\n";
+           } else {
+               SaveUser(username,Password,CellphoneNumber);
+               message += "REGISTRATION SUCCESAFUL! Welcome," + username + "!\n";
+           }
+       } else {
+           message += "REGISTRATION FAIL. Please fix the errors above. \n";
+               }
+       
+       message += "--------------------------\n";
+       System.out.println(message);
+    }
+    
+    //checks for saved users
+    public boolean loginUser() {
+        Scanner input = new Scanner (System.in);
+        System.out.println("\n=== Login ===");
+        
+        System.out.println("Enter Username: ");
+        String username = input.nextLine().trim();
+        
+        System.out.println("Enter Password: ");
+        String Password = input.nextLine().trim();
+        
+        System.out.println("-----------------------------\n");
+        if (checkCredentials(username, Password)) {
+            System.out.println("LOGIN SUCCESSFUL! Welcome back," + username + "!");
+            System.out.println("---------------------------\n");
+            return true;
+        } else {
+            System.out.println("LOGIN UNSUCCESSFUL> Incorrect username or password.");
+            System.out.println("----------------------------------\n");
+            return false;
+        }
+        
+    }
+    // file helpers
+    //** Saves new users to the system*/
+    private void Save user(String username, String Password, String CellphoneNumber){
+        try(FileWriter fw = new FileWriter(USER_FILE, true));
+        
+        BufferedWriter bw = new BufferedWriter(fw)) {
+            bw.write(username + "," + Password + "," + CellphoneNumber);
+            
+            bw.newLine();
+        } catch (IOExeption e) {
+                System.out.println(" [Error] could not save user: " + e.getMessage());
+        }
+        } 
+        /**Checks if user already Exist in the file */
+        private boolean userExist(String username) {
+            try (BufferedReader br = new BufferedReader(new fileReader(USER_FILE))) {
+                String line;
+                while ((line = br.readLine()) !=null) {
+                    String[] parts= line.split(",");
+                    if(parts.length >= 1 &&parts[0].equals(username)) {
+                        
+                        return true;
+                    }
+                       }
+            } catch (IOException e) {
+                
+            }
+            return false;
+    }
+    
+}
