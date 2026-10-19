@@ -1,0 +1,71 @@
+package com.mycompany.mychatting_app;
+
+import org.junit.test;
+import static org.junit.Assert.*
+        
+/**
+ *
+ * @author ST10516248
+ */
+public class MessageTest {
+    
+    //Test 1: Message length - success(under 250)
+    @Test
+    public void testCheckMessageLengthSuccess(){
+        String result = Messages.checkMessageLength(
+        "Hi Amanda, can you join us for dinner tonight?");
+        assertEquals("Messsage ready to send.", result);
+    }
+    
+    //Test 2: Message length - unsuccessful (over 250)
+    @Test
+    public void testCheckMessageLengthFailure() {
+        String longMessage = "A". repeat (251);
+        String result = Message.checkMessageLength(longMessage);
+        assertTrue(result.contains("Message exceeds 250 characters by"));
+    }
+    
+    //Test 3: Recipient cell - success(valid +27 number)
+    @test 
+    public void testCheckRecipientCellFailure() {
+        Message msg = new Messages ("0780276939",
+        "Hi Kea,did you get the payment?");
+        String result = msg.checkRecipientCell();
+        assertTrue(result.contains("incorrectly written")||
+                result.contains("international code");
+    }
+    
+    //Test4: Message
+    @Test public void testCreateMessageHash() {
+        Message msg = new Messages ("+27835213587", 
+      "Hi Kea,can you join us for dinner tonight?");
+        String hash = msg.getMessageHsh();
+        assertNotNull(hash);
+        assertTrue(Hash.contains(":"));
+        assertEquals(hash, hash.toUpperCase());
+    }
+    
+    //Test 5: SentMessage -send
+    @Test
+    public void testSentMessageSend(){
+        Message msg = msg Messages("+27835213587"
+        "Hi Kea, can you join us for dinner tonight?");
+        assertEquals("Message successfully sent.", msg.SentMessage(1));
+    }
+    
+    //Test 6: SentMessage - disregard
+    @Test
+    public void testSendMessageDisregard(){
+        Message msg= new Messages("+2783523587",
+        "Hi Kean, can you join us for dinner tonight?");
+        assertEquals("Message successfully sent.", msg.SentMessage(2));
+    }
+    
+    //Test 7: Return total messages sent
+    @Test public void testReturnTotalMessages() {
+        int before = Messages.returnTotalMessages();
+        Messages msg = new Messages("+27835213587",
+        "Hi Kean, can you join us for dinner tonight?");
+        assertEquals("Message successfully sent.", msg.SentMessage(1));   
+    }
+}
